@@ -26,19 +26,26 @@ def update_rolling_hash(prev_hash, prev_kmer, next_kmer, k, base=4):
     return (prev_hash - ord(prev_kmer[0]) * (base ** (k - 1))) * base + ord(next_kmer[-1])
 
 def calculate_minimizers(seqRecord, k, w):
-    rev_comp_sequence = seqRecord.reverse_complement()
-    sequence = sorted([str(seqRecord.seq), str(rev_comp_sequence.seq)])[0]
+    rev_comp_sequence = str(seqRecord.reverse_complement().seq)
+    sequence = str(seqRecord.seq)
 
     # Initialize hashes for the first k-mer in both strands
     hash_forward = rolling_hash(sequence[:k], k)
+    hash_rev_comp = rolling_hash(rev_comp_sequence[:k], k)
+
     hashes_forward = [hash_forward]
+    hashes_rev_comp = [hash_rev_comp]
+
     # Calculate rolling hashes for the rest of the k-mers in both strands
     for i in range(1, len(sequence) - k + 1):
         hash_forward = update_rolling_hash(hash_forward, sequence[i-1:i-1+k], sequence[i:i+k], k)
+        hash_rev_comp = update_rolling_hash(hash_rev_comp, rev_comp_sequence[i-1:i-1+k], rev_comp_sequence[i:i+k], k)
         hashes_forward.append(hash_forward)
+        hashes_rev_comp.append(hash_rev_comp)
 
     # Find minimizers in windows of w consecutive k-mers
-    minimizers = set([min(hashes_forward[i:i+w]) for i in range(len(hashes_forward) - w + 1)])
+    minimizers = set([min(min(hashes_forward[i:i+w]), min(hashes_rev_comp[i:i+w])) for i in range(len(hashes_forward) - w + 1)])
+
 
     return (seqRecord.id, minimizers)
 
