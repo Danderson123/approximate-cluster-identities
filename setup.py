@@ -18,7 +18,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'aci=approximate_cluster_identities:main',
+            'aci=approximate_cluster_identities.__main__:main',
         ],
     },
     classifiers=[
