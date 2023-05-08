@@ -64,7 +64,7 @@ def calculate_jaccard_distance(chunk,
     return distances
 
 def write_distance_gml(sequence_records,
-                    mash_df,
+                    distance_df,
                     metadata,
                     output_gml):
     G = nx.Graph()
@@ -72,9 +72,12 @@ def write_distance_gml(sequence_records,
     for seq in tqdm(sequence_records):
         G.add_node(seq.id, cluster=metadata[seq.id])
     sys.stderr.write("\t\tWriting edges...\n")
-    for idx, row in tqdm(mash_df.iterrows()):
-        G.add_edge(row['seq1'], row['seq2'], weight=row['identity'])
-    nx.write_gml(G, output_gml)
+    seq1 = list(distance_df["seq1"])
+    seq2 = list(distance_df["seq2"])
+    identity = list(distance_df["identity"])
+    for i in tqdm(range(len(seq1))):
+        G.add_edge(seq1[i], seq2[i], weight=identity[i])
+    nx.write_gml(G, output_gml + ".gml")
 
 def calculate_cluster_stats(cluster_df, metadata):
     seq1 = [metadata[s] for s in list(cluster_df["seq1"])]

@@ -1,6 +1,6 @@
 # Approximate Cluster Identities (ACI)
 
-A python package to visualise the approximate within and between cluster identities of short sequences as assigned by e.g. mmseqs2, cd-hit or panaroo.
+A python package to visualise the approximate within and between cluster identities of a large number of short sequences as assigned by e.g. mmseqs2, cd-hit or panaroo.
 
 # Installation
 ```
@@ -37,7 +37,7 @@ optional arguments:
 
 # Methods
 
-We calculate sequence identities by pairwise calculation of jaccard distances using minimizers of size ```--kmerSize``` where 1 *k*-mer is sampled from a window of a total of ```--windowSize``` *k*-mers that slides across the input sequences. Increasing ```--windowSize``` will decrease the number of minimizers per sequence, decreasing the sensitivity of the identity calculations but increasing the speed of the programme. This tool is designed to give you an idea of how variable a large number of short sequences are within and between clusters to choose an appropriate sequencing clustering tool and its parameters.
+We calculate sequence identities by pairwise calculation of jaccard distances using minimizers of size ```--kmerSize``` where 1 *k*-mer is sampled from a window that slides across each sequence, each containing a total of ```--windowSize``` *k*-mers. Increasing ```--windowSize``` will decrease the number of minimizers per sequence, decreasing the sensitivity of the identity calculations but increasing the speed of the programme. This tool is designed to give you an idea of how variable a large number of short sequences are within and between clusters to choose an appropriate sequencing clustering tool and its parameters.
 
 # Example output
 
