@@ -46,21 +46,21 @@ Example cluster plots for data in ```test/``` using ```--windowSize 1``` and ```
 ### Window size = 1
 
 #### Mean identities
-![Mean identities](images/cluster_distances_window_1.mean.png)
+![Mean identities](https://github.com/Danderson123/approximate-cluster-identities/blob/main/images/cluster_distances_window_1.mean.png)
 #### Mode identities
-![Mode identities](images/cluster_distances_window_1.mode.png)
+![Mode identities](https://github.com/Danderson123/approximate-cluster-identities/blob/main/images/images/cluster_distances_window_1.mode.png)
 #### Median identities
-![Median identities](images/cluster_distances_window_1.median.png)
+![Median identities](https://github.com/Danderson123/approximate-cluster-identities/blob/main/images/images/cluster_distances_window_1.median.png)
 #### Range identities
-![Range of identities](images/cluster_distances_window_1.range.png)
+![Range of identities](https://github.com/Danderson123/approximate-cluster-identities/blob/main/images/images/cluster_distances_window_1.range.png)
 
 ### Window size = 100
 
 #### Mean identities
-![Mean identities](images/cluster_distances_window_100.mean.png)
+![Mean identities](https://github.com/Danderson123/approximate-cluster-identities/blob/main/images/images/cluster_distances_window_100.mean.png)
 #### Mode identities
-![Mode identities](images/cluster_distances_window_100.mode.png)
+![Mode identities](https://github.com/Danderson123/approximate-cluster-identities/blob/main/images/images/cluster_distances_window_100.mode.png)
 #### Median identities
-![Median identities](images/cluster_distances_window_100.median.png)
+![Median identities](https://github.com/Danderson123/approximate-cluster-identities/blob/main/images/images/cluster_distances_window_100.median.png)
 #### Range identities
-![Range of identities](images/cluster_distances_window_100.range.png)
+![Range of identities](https://github.com/Danderson123/approximate-cluster-identities/blob/main/images/images/cluster_distances_window_100.range.png)
