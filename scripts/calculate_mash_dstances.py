@@ -1,7 +1,7 @@
 import os
 from Bio import SeqIO
 import argparse
-from minimiser_distance.minimiser_distances import read_metadata, write_distance_gml
+from approximate_cluster_identities.__main__ import read_metadata, write_distance_gml
 from joblib import Parallel, delayed
 from tempfile import TemporaryDirectory
 from tqdm import tqdm

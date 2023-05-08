@@ -1,15 +1,16 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='minimiser-distance',
+    name='approximate_cluster_identities',
     version='0.1',
-    description='A package to calculate and visualise approximate jaccard distances for short nucleotide sequences using minimisers.',
+    description='A package to calculate and visualise approximate cluster identities for a large number of short nucleotide sequences using minimisers.',
     author='Daniel Anderson',
     author_email='danp.anderson@outlook.com',
     packages=find_packages(),
     install_requires=[
         'biopython',
         'pandas',
+        'matplotlib',
         'networkx',
         'numpy',
         'tqdm',
@@ -17,7 +18,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'minimiser-distance=minimiser_distance:main',
+            'aci=approximate_cluster_identities:main',
         ],
     },
     classifiers=[
