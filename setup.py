@@ -13,6 +13,7 @@ setup(
         'matplotlib',
         'networkx',
         'numpy',
+        'seaborn',
         'tqdm',
         'joblib'
     ],
