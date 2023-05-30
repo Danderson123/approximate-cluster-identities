@@ -19,10 +19,10 @@ if __name__=="__main__":
     fasta_file = "test/test_sequences.fa"
     threads = 8
     output_dir = "cluster_tool_tests"
-    min_seq_id = 0.9
+    min_seq_id = 0.98
     temp_dir = "/tmp"
     mmseqs_bin_path = "mmseqs/bin/mmseqs"
-    cdhit_bin_path = "cdhit-est"
+    cdhit_bin_path = "cdhit"
 
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
@@ -32,7 +32,7 @@ if __name__=="__main__":
     if args.mmseqs2:
         if not os.path.exists(os.path.join(output_dir, "mmseqs2")):
             os.mkdir(os.path.join(output_dir, "mmseqs2"))
-        for cov_mode in tqdm(["0", "1", "5"]):
+        for cov_mode in tqdm(["5", "0", "1"]):
             if not os.path.exists(os.path.join(output_dir, "mmseqs2", f"cov_mode_{cov_mode}")):
                 os.mkdir(os.path.join(output_dir, "mmseqs2", f"cov_mode_{cov_mode}"))
             for c in ["0.1", "0.5","0.9"]:
@@ -203,7 +203,9 @@ if __name__=="__main__":
                                     "-s",
                                     str(c),
                                     "-n",
-                                    "10",
+                                    "4",
+                                    "-g",
+                                    "1",
                                     "-M",
                                     "15000"])
             subprocess.run(cluster_command,
