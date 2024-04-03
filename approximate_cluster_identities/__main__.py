@@ -6,6 +6,7 @@ import json
 import networkx as nx
 import numpy as np
 import pandas as pd
+import random
 import sourmash
 import seaborn as sns
 import statistics
@@ -28,19 +29,20 @@ def calculate_minimizers(seqRecord, k, w):
     return (seqRecord.id, get_minhash(sequence, k, w))
 
 def calculate_distance(chunk,
+                kmer_sets_dict,
                 shorter):
     distances = []
     for c in tqdm(chunk):
-        seq1 = c[0]
-        seq2 = c[1]
+        seq1 = kmer_sets_dict[c[0]]
+        seq2 = kmer_sets_dict[c[1]]
         if not shorter:
-            dist = seq1[1].jaccard(seq2[1])
+            dist = seq1.jaccard(seq2)
         else:
-            seq1_hashes = set(seq1[1].hashes)
-            seq2_hashes = set(seq2[1].hashes)
+            seq1_hashes = set(seq1.hashes)
+            seq2_hashes = set(seq2.hashes)
             intersection_length = len(seq1_hashes & seq2_hashes)
             dist = float(max([intersection_length / len(seq1_hashes), intersection_length / len(seq2_hashes)]))
-        distances.append((seq1[0], seq2[0], dist))
+        distances.append((c[0], c[1], dist))
     return distances
 
 def write_distance_gml(sequence_records,
@@ -159,20 +161,34 @@ def main():
     # read fasta files
     sys.stderr.write("Reading sequences\n")
     sequence_records = list(SeqIO.parse(args.input_fasta, "fasta"))
+    # subsample the clusters
+    random.shuffle(sequence_records)
+    cluster_count = set()
+    subsampled_records = []
+    for record in sequence_records:
+        if len(cluster_count) < 2500:
+            subsampled_records.append(record)
+            cluster_count.add(metadata[record.id])
+        else:
+            break
     # extract minimisers from sequences
     sys.stderr.write(f"Extracting minimisers using {str(args.threads)} threads...\n")
     kmer_sets = Parallel(n_jobs=args.threads)(delayed(calculate_minimizers)(seq,
                                                                         args.kmerSize,
-                                                                        args.windowSize) for seq in tqdm(sequence_records))
+                                                                        args.windowSize) for seq in tqdm(subsampled_records))
+    kmer_sets_dict = {}
+    for pair in kmer_sets:
+        kmer_sets_dict[pair[0]] = pair[1]
+    # Get all unique pairs of sequences
+    sys.stderr.write(f"Enumerating all sequence combinations...\n")
+    all_comparisons = [c for c in tqdm(combinations(list(kmer_sets_dict.keys()), 2))]
     # Calculate distances
     sys.stderr.write(f"Calculating approximate jaccard distances using {str(args.threads)} threads...\n")
     distances = []
-    # Get all unique pairs of sequences
-    all_comparisons = [c for c in combinations(kmer_sets, 2)]
     # Split pairs into chunks based on the number of threads
     chunks = np.array_split(all_comparisons, args.threads)
     # Calculate approximate jaccard distances
-    chunk_distances = Parallel(n_jobs=args.threads)(delayed(calculate_distance)(c, args.shorter) for c in chunks)
+    chunk_distances = Parallel(n_jobs=args.threads)(delayed(calculate_distance)(c, kmer_sets_dict, args.shorter) for c in chunks)
     for thread_distances in chunk_distances:
         distances += thread_distances
     # convert pairwise distances to dataframe
