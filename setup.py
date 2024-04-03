@@ -6,8 +6,8 @@ with open('README.md', 'r', encoding='utf-8') as f:
 
 setup(
     name='approximate_cluster_identities',
-    version='0.1.4',
-    description='A package to calculate and visualise approximate cluster identities for a large number of short nucleotide sequences using minimisers.',
+    version='0.1.5',
+    description='A package to calculate and visualise approximate cluster identities for a large number of short nucleotide sequences using minimizers.',
     long_description=long_description,
     long_description_content_type='text/markdown',
     author='Daniel Anderson',
@@ -20,6 +20,7 @@ setup(
         'networkx',
         'numpy',
         'seaborn',
+        'sourmash',
         'tqdm',
         'joblib'
     ],
@@ -32,7 +33,7 @@ setup(
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering :: Bio-Informatics',
-        'License :: OSI Approved :: MIT License',
+        'License :: OSI Approved :: Apache License',
         'Programming Language :: Python :: 3.6',
     ]
 )

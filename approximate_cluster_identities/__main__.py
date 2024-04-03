@@ -6,6 +6,7 @@ import json
 import networkx as nx
 import numpy as np
 import pandas as pd
+import sourmash
 import seaborn as sns
 import statistics
 import sys
@@ -16,50 +17,29 @@ def read_metadata(input_json):
         metadata = json.load(f)
     return metadata
 
-def rolling_hash(seq, k, base=4):
-    hash_value = 0
-    for i in range(k):
-        hash_value = hash_value * base + ord(seq[i])
-    return hash_value
-
-def update_rolling_hash(prev_hash, prev_kmer, next_kmer, k, base=4):
-    return (prev_hash - ord(prev_kmer[0]) * (base ** (k - 1))) * base + ord(next_kmer[-1])
+def get_minhash(sequence, k, w):
+    assert not len(sequence) < w + k, f"The value of k or w is too large. Their sum should be no less than {len(sequence)}."
+    minhash = sourmash.MinHash(n=0, ksize=k, scaled=w)
+    minhash.add_sequence(sequence, force=True)
+    return minhash
 
 def calculate_minimizers(seqRecord, k, w):
-    rev_comp_sequence = str(seqRecord.reverse_complement().seq)
     sequence = str(seqRecord.seq)
+    return (seqRecord.id, get_minhash(sequence, k, w))
 
-    # Initialize hashes for the first k-mer in both strands
-    hash_forward = rolling_hash(sequence[:k], k)
-    hash_rev_comp = rolling_hash(rev_comp_sequence[:k], k)
-
-    hashes_forward = [hash_forward]
-    hashes_rev_comp = [hash_rev_comp]
-
-    # Calculate rolling hashes for the rest of the k-mers in both strands
-    for i in range(1, len(sequence) - k + 1):
-        hash_forward = update_rolling_hash(hash_forward, sequence[i-1:i-1+k], sequence[i:i+k], k)
-        hash_rev_comp = update_rolling_hash(hash_rev_comp, rev_comp_sequence[i-1:i-1+k], rev_comp_sequence[i:i+k], k)
-        hashes_forward.append(hash_forward)
-        hashes_rev_comp.append(hash_rev_comp)
-
-    # Find minimizers in windows of w consecutive k-mers
-    minimizers = set([min(min(hashes_forward[i:i+w]), min(hashes_rev_comp[i:i+w])) for i in range(len(hashes_forward) - w + 1)])
-    assert not len(minimizers) == 0, "Your chosen windowSize is larger than your shortest sequence. Reduce the windowSize and rerun the tool."
-    return (seqRecord.id, minimizers)
-
-def calculate_jaccard_distance(chunk,
-                            shorter):
+def calculate_distance(chunk,
+                shorter):
     distances = []
     for c in tqdm(chunk):
         seq1 = c[0]
         seq2 = c[1]
-        len_intersection = len(seq1[1].intersection(seq2[1]))
         if not shorter:
-            dist = float(len_intersection / (len(seq1[1]) + len(seq2[1]) - len_intersection))
+            dist = seq1[1].jaccard(seq2[1])
         else:
-            shorter = seq1[1] if len(seq1[1]) < len(seq2[1]) else seq2[1]
-            dist = float(len_intersection / len(shorter))
+            seq1_hashes = set(seq1[1].hashes)
+            seq2_hashes = set(seq2[1].hashes)
+            intersection_length = len(seq1_hashes & seq2_hashes)
+            dist = float(max([intersection_length / len(seq1_hashes), intersection_length / len(seq2_hashes)]))
         distances.append((seq1[0], seq2[0], dist))
     return distances
 
@@ -192,7 +172,7 @@ def main():
     # Split pairs into chunks based on the number of threads
     chunks = np.array_split(all_comparisons, args.threads)
     # Calculate approximate jaccard distances
-    chunk_distances = Parallel(n_jobs=args.threads)(delayed(calculate_jaccard_distance)(c, args.shorter) for c in chunks)
+    chunk_distances = Parallel(n_jobs=args.threads)(delayed(calculate_distance)(c, args.shorter) for c in chunks)
     for thread_distances in chunk_distances:
         distances += thread_distances
     # convert pairwise distances to dataframe

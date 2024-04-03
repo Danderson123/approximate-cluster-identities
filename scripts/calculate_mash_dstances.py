@@ -18,7 +18,7 @@ def write_sequence_to_temp_file(sequence, temp_dir):
 
 def run_mash_sketch(sequence_files_path, threads, mash_path, kmer_size):
     sketch_file = os.path.join(os.path.dirname("./."), "reference.msh")
-    os.system(f"{mash_path} sketch -k {kmer_size} -p {threads} -l {sequence_files_path} -o {sketch_file}")
+    #os.system(f"{mash_path} sketch -k {kmer_size} -p {threads} -l {sequence_files_path} -o {sketch_file}")
     return sketch_file
 
 def run_mash_dist(sketch_file, mash_path, threads, kmerSize):
